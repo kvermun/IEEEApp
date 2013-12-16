@@ -170,7 +170,7 @@ namespace Microsoft.Samples.Kinect.WpfViewers
         private Point GetPosition2DLocation(DepthImageFrame depthFrame, SkeletonPoint skeletonPoint)
         {
             DepthImagePoint depthPoint = depthFrame.MapFromSkeletonPoint(skeletonPoint);
-         
+
             switch (ImageType)
             {
                 case ImageType.Color:
@@ -187,7 +187,6 @@ namespace Microsoft.Samples.Kinect.WpfViewers
                 default:
                     throw new ArgumentOutOfRangeException("ImageType was a not expected value: " + ImageType.ToString());
             }
-            
         }
 
         private void CreateListOfSkeletonCanvases()
