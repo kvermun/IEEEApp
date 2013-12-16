@@ -22,7 +22,7 @@ namespace IEEEApp
     {
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();//
         }
 
         private void kinectSensorChooser1_KinectSensorChanged(object sender, DependencyPropertyChangedEventArgs e)
