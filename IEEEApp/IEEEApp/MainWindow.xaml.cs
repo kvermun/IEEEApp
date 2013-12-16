@@ -22,8 +22,12 @@ namespace IEEEApp
     {
         public MainWindow()
         {
-            InitializeComponent();//
+            InitializeComponent();
         }
+
+        const int skeletonCount = 6;
+        Skeleton[] allSkeletons = new Skeleton[skeletonCount];
+        Skeleton first;
 
         private void kinectSensorChooser1_KinectSensorChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -47,7 +51,35 @@ namespace IEEEApp
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
+            first = GetFirstSkeleton(e);
 
+            if (first == null)
+            {
+                return;
+            }
+
+        }
+
+        Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
+        {
+            using (SkeletonFrame skeletonFrameData = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrameData == null)
+                {
+                    return null;
+                }
+
+
+                skeletonFrameData.CopySkeletonDataTo(allSkeletons);
+
+                //get the first tracked skeleton
+                Skeleton first = (from s in allSkeletons
+                                  where s.TrackingState == SkeletonTrackingState.Tracked
+                                  select s).FirstOrDefault();
+
+                return first;
+
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
