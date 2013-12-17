@@ -13,6 +13,8 @@ namespace FaceTrackingBasics
     using System.Windows.Media.Imaging;
     using Microsoft.Kinect;
     using Microsoft.Kinect.Toolkit;
+    using Microsoft.Kinect.Toolkit.FaceTracking;
+
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
