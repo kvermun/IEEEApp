@@ -12,6 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
+using Microsoft.Kinect.Toolkit;
+using Microsoft.Kinect.Toolkit.FaceTracking;
 
 namespace IEEEApp
 {
@@ -30,6 +32,7 @@ namespace IEEEApp
         Skeleton first;
         SkeletonPoint KneeCentre;
         Joint MidKnee;
+        FaceTracker faceTracker;
 
         private void kinectSensorChooser1_KinectSensorChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -48,6 +51,8 @@ namespace IEEEApp
             {
                 kinectSensorChooser1.AppConflictOccurred();
             }
+
+            faceTracker = new FaceTracker(sensor);
 
         }
 
@@ -227,8 +232,17 @@ namespace IEEEApp
            textBox1.Text = "Right angle " + rightAngle ;
            textBox2.Text = " LeftAngle " + leftAngle;
            textBox3.Text = " MidAngle " + midAngle;
-          
 
+            //facetracking part in the given function: faceFrameInit(skeleton)
+                  
+
+        }
+
+        public void faceFrameInit(Skeleton skeleton)
+        {
+            /*FaceTrackFrame faceFrame = faceTracker.Track(kinectSensorChooser1.Kinect.ColorStream.Format, kinectSensorChooser1.Kinect.colorPixelData,
+                                  kinectSensorChooser1.Kinect.DepthStream.Format, depthPixelData,
+                                  skeleton);*/
         }
 
         Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
