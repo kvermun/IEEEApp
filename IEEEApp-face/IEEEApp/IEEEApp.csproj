@@ -43,6 +43,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Microsoft SDKs\Kinect\v1.8\Assemblies\Microsoft.Kinect.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Kinect.Toolkit">
+      <HintPath>..\..\..\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.8.0\Assemblies\Microsoft.Kinect.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Kinect.Toolkit.BackgroundRemoval">
       <HintPath>..\..\..\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.8.0\Assemblies\Microsoft.Kinect.Toolkit.BackgroundRemoval.dll</HintPath>
     </Reference>
@@ -110,6 +113,10 @@
     <ProjectReference Include="..\..\Dependencies\KinectWpfViewers\Microsoft.Samples.Kinect.WpfViewers.csproj">
       <Project>{4DE23893-27E7-423F-9BB6-BA21DAC2C45E}</Project>
       <Name>Microsoft.Samples.Kinect.WpfViewers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Dependencies\Microsoft.Kinect.Toolkit.FaceTracking\Microsoft.Kinect.Toolkit.FaceTracking.csproj">
+      <Project>{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}</Project>
+      <Name>Microsoft.Kinect.Toolkit.FaceTracking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

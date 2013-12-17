@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Samples.Kinect.Wp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaceTrackingBasics-WPF", "..\Dependencies\FaceTrackingBasics-WPF\FaceTrackingBasics-WPF.csproj", "{8FB2DEA6-9900-4FC5-87E4-B54188F62884}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Kinect.Toolkit", "..\Dependencies\Microsoft.Kinect.Toolkit\Microsoft.Kinect.Toolkit.csproj", "{C6F9C31B-6130-4443-A5CC-EF0664552ECD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Kinect.Toolkit.FaceTracking", "..\Dependencies\Microsoft.Kinect.Toolkit.FaceTracking\Microsoft.Kinect.Toolkit.FaceTracking.csproj", "{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +69,36 @@ Global
 		{8FB2DEA6-9900-4FC5-87E4-B54188F62884}.Release|x64.ActiveCfg = Release|x64
 		{8FB2DEA6-9900-4FC5-87E4-B54188F62884}.Release|x64.Build.0 = Release|x64
 		{8FB2DEA6-9900-4FC5-87E4-B54188F62884}.Release|x86.ActiveCfg = Release|x64
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Release|Win32.ActiveCfg = Release|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Release|x64.ActiveCfg = Release|Any CPU
+		{C6F9C31B-6130-4443-A5CC-EF0664552ECD}.Release|x86.ActiveCfg = Release|Any CPU
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|Win32.Build.0 = Debug|Win32
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|x64.ActiveCfg = Debug|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|x64.Build.0 = Debug|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Debug|x86.ActiveCfg = Debug|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|Any CPU.ActiveCfg = Release|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|Mixed Platforms.Build.0 = Release|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|Win32.ActiveCfg = Release|Win32
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|Win32.Build.0 = Release|Win32
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|x64.ActiveCfg = Release|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|x64.Build.0 = Release|x64
+		{1BCF9CEE-DF01-430E-B49D-41A9A88963EB}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
