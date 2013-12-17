@@ -1,17 +1,19 @@
-﻿
+﻿using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Microsoft.Kinect;
+using Microsoft.Kinect.Toolkit;
+using Microsoft.Kinect.Toolkit.FaceTracking;
+
 
 
 namespace IEEEApp
 {
 
-    using System;
-    using System.Windows;
-    using System.Windows.Data;
-    using System.Windows.Media;
-    using System.Windows.Media.Imaging;
-    using Microsoft.Kinect;
-    using Microsoft.Kinect.Toolkit;
-
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -22,6 +24,10 @@ namespace IEEEApp
         private WriteableBitmap colorImageWritableBitmap;
         private byte[] colorImageData;
         private ColorImageFormat currentColorImageFormat = ColorImageFormat.Undefined;
+        FaceTracker faceTracker;
+        private byte[] colorPixelData;
+        private short[] depthPixelData;
+        private Skeleton[] skeletonData;
 
         public MainWindow()
         {
@@ -33,6 +39,8 @@ namespace IEEEApp
             sensorChooser.KinectChanged += SensorChooserOnKinectChanged;
 
             sensorChooser.Start();
+
+            
         }
 
         private void SensorChooserOnKinectChanged(object sender, KinectChangedEventArgs kinectChangedEventArgs)
@@ -55,8 +63,8 @@ namespace IEEEApp
             {
                 try
                 {
-                    newSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-                    newSensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
+                    newSensor.ColorStream.Enable();
+                    newSensor.DepthStream.Enable();
                     try
                     {
                         // This will throw on non Kinect For Windows devices.
@@ -71,7 +79,16 @@ namespace IEEEApp
 
                     newSensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
                     newSensor.SkeletonStream.Enable();
+
+                    colorPixelData = new byte[newSensor.ColorStream.FramePixelDataLength];
+                    depthPixelData = new short[newSensor.DepthStream.FramePixelDataLength];
+                    skeletonData = new Skeleton[6];
+
+                    faceTracker = new FaceTracker(newSensor);
+                    
                     newSensor.AllFramesReady += KinectSensorOnAllFramesReady;
+
+
                 }
                 catch (InvalidOperationException)
                 {
@@ -94,14 +111,16 @@ namespace IEEEApp
             faceTrackingViewer.Dispose();
         }
 
-        private void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs allFramesReadyEventArgs)
+        private void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            using (var colorImageFrame = allFramesReadyEventArgs.OpenColorImageFrame())
+            using (var colorImageFrame = e.OpenColorImageFrame())
             {
                 if (colorImageFrame == null)
                 {
                     return;
                 }
+
+
 
                 // Make a copy of the color frame for displaying.
                 var haveNewFormat = this.currentColorImageFormat != colorImageFrame.Format;
@@ -120,7 +139,61 @@ namespace IEEEApp
                     this.colorImageData,
                     colorImageFrame.Width * Bgr32BytesPerPixel,
                     0);
+
             }
+
+            /*using (ColorImageFrame colorImageFrame = e.OpenColorImageFrame())
+            {
+                if (colorImageFrame == null)
+                    return;
+                colorImageFrame.CopyPixelDataTo(colorPixelData);
+            }*/
+
+            using (DepthImageFrame depthImageFrame = e.OpenDepthImageFrame())
+            {
+                if (depthImageFrame == null)
+                    return;
+                depthImageFrame.CopyPixelDataTo(depthPixelData);
+            }
+
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrame == null)
+                    return;
+                skeletonFrame.CopySkeletonDataTo(skeletonData);
+            }
+
+            // Retrieve the first tracked skeleton if any. Otherwise, do nothing.
+            Skeleton skeleton = (from s in skeletonData
+                                 where s.TrackingState == SkeletonTrackingState.Tracked
+                                 select s).FirstOrDefault();
+            if (skeleton == null)
+                return;
+
+            // Make the faceTracker processing the data.
+            FaceTrackFrame faceFrame = faceTracker.Track(kinectSensorChooser1.Kinect.ColorStream.Format, this.colorImageData,
+                                              kinectSensorChooser1.Kinect.DepthStream.Format, depthPixelData,
+                                              skeleton);
+
+            if (faceFrame.TrackSuccessful)
+            {
+                
+                Vector3DF faceRotation = faceFrame.Rotation;
+                
+                var AUCoeff = faceFrame.GetAnimationUnitCoefficients();
+                
+                var jawLower = AUCoeff[AnimationUnit.JawLower];
+                var BrowLower = AUCoeff[AnimationUnit.BrowLower];
+                var BrowUpper = AUCoeff[AnimationUnit.BrowRaiser];
+                var lcd = AUCoeff[AnimationUnit.LipCornerDepressor];
+                var lipRaiser = AUCoeff[AnimationUnit.LipRaiser];
+                var lipStrectch = AUCoeff[AnimationUnit.LipStretcher];
+                var Pitch = faceRotation.X;
+                var Yaw = faceRotation.Y;
+                var Roll = faceRotation.Z;
+
+            }
+
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
