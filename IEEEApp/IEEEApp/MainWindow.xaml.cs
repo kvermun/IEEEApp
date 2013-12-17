@@ -30,6 +30,12 @@ namespace IEEEApp
         Skeleton first;
         SkeletonPoint KneeCentre;
         Joint MidKnee;
+        double rightAngle, leftAngle, midAngle, bendAngle = 90, sitAngle = 110, standAngle = 160, thresh1 = 20.0f, thresh2 = 15.0f;
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
+        }
 
         private void kinectSensorChooser1_KinectSensorChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -51,28 +57,60 @@ namespace IEEEApp
 
         }
 
+        void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
+        {
+            first = GetFirstSkeleton(e);
+
+            if (first == null)
+            {
+                return;
+            }
+
+            callMain();
+        }
+
+        private void StopKinect(KinectSensor sensor)
+        {
+            if (sensor != null)
+            {
+                if (sensor.IsRunning)
+                {
+                    //stop sensor 
+                    sensor.Stop();
+
+                    //stop audio if not null
+                    if (sensor.AudioSource != null)
+                    {
+                        sensor.AudioSource.Stop();
+                    }
+
+                }
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            kinectSensorChooser1.Kinect.DepthStream.Disable();
+            kinectSensorChooser1.Kinect.ColorStream.Disable();
+            kinectSensorChooser1.Kinect.SkeletonStream.Disable();
+            StopKinect(kinectSensorChooser1.Kinect);
+        }
+
         void getMidKnee()
         {
-           // KneeCentre.Position.Equals(first.Joints[JointType.KneeLeft].Position + first.Joints[JointType.KneeRight].Position);
             KneeCentre.X = (first.Joints[JointType.KneeLeft].Position.X + first.Joints[JointType.KneeRight].Position.X)/2;
             KneeCentre.Y = (first.Joints[JointType.KneeLeft].Position.Y + first.Joints[JointType.KneeRight].Position.Y) / 2;
             KneeCentre.Z = (first.Joints[JointType.KneeLeft].Position.Z + first.Joints[JointType.KneeRight].Position.Z) / 2;
-            
-            
         }
 
         public static double vectorNorm(double x, double y, double z)
         {
-
             return Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
-
         }
 
         public static double vectorNorm( double y, double z)
         {
-
             return Math.Sqrt(Math.Pow(y, 2) + Math.Pow(z, 2));
-
         }
 
         double CalculateAngle3D(Joint shoulder, Joint hip, SkeletonPoint knee)
@@ -103,7 +141,6 @@ namespace IEEEApp
             }
             else
                 angle = 0;
-
 
             return angle;
         }
@@ -141,7 +178,6 @@ namespace IEEEApp
             else
                 angle = 0;
 
-
             return angle;
         }
 
@@ -172,7 +208,6 @@ namespace IEEEApp
             }
             else
                 angle = 0;
-
 
             return angle;
         }
@@ -206,30 +241,10 @@ namespace IEEEApp
             else
                 angle = 0;
 
-
             return angle;
         }
 
-        void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
-        {
-            first = GetFirstSkeleton(e);
-
-            if (first == null)
-            {
-                return;
-            }
-
-           getMidKnee();
-           double  rightAngle = CalculateAngle2D(first.Joints[JointType.ShoulderLeft], first.Joints[JointType.HipLeft], first.Joints[JointType.KneeLeft]);
-           double  leftAngle = CalculateAngle2D(first.Joints[JointType.ShoulderRight], first.Joints[JointType.HipRight], first.Joints[JointType.KneeRight]);
-           double  midAngle = CalculateAngle2D(first.Joints[JointType.ShoulderCenter], first.Joints[JointType.HipCenter], KneeCentre);
-
-           textBox1.Text = "Right angle " + rightAngle ;
-           textBox2.Text = " LeftAngle " + leftAngle;
-           textBox3.Text = " MidAngle " + midAngle;
-          
-
-        }
+      
 
         Skeleton GetFirstSkeleton(AllFramesReadyEventArgs e)
         {
@@ -253,37 +268,49 @@ namespace IEEEApp
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        void checkUser()
         {
-            kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
-        }
+            rightAngle = CalculateAngle2D(first.Joints[JointType.ShoulderLeft], first.Joints[JointType.HipLeft], first.Joints[JointType.KneeLeft]);
+            leftAngle = CalculateAngle2D(first.Joints[JointType.ShoulderRight], first.Joints[JointType.HipRight], first.Joints[JointType.KneeRight]);
+            // double midAngle = CalculateAngle2D(first.Joints[JointType.ShoulderCenter], first.Joints[JointType.HipCenter], KneeCentre);
+            midAngle = (rightAngle + leftAngle) / 2;
 
-        private void StopKinect(KinectSensor sensor)
-        {
-            if (sensor != null)
+            if (midAngle <= sitAngle + thresh1 && midAngle >= sitAngle - thresh1)
             {
-                if (sensor.IsRunning)
-                {
-                    //stop sensor 
-                    sensor.Stop();
-
-                    //stop audio if not null
-                    if (sensor.AudioSource != null)
-                    {
-                        sensor.AudioSource.Stop();
-                    }
-
-
-                }
+                UserPresence.Text = "The user is Sitting " + midAngle;
+                P_N.Text = " Positive " ;
+                Emotion.Text = " Neutral " ;
             }
+            else if (midAngle <= bendAngle + thresh2 && midAngle >= bendAngle - thresh2)
+            {
+                UserPresence.Text = "The user is Sitting " + midAngle;
+                P_N.Text = " Positive ";
+                Emotion.Text = " Enthusiastic ";
+            }
+            else if (midAngle <= standAngle + thresh1 && midAngle >= standAngle - thresh1)
+            {
+                UserPresence.Text = "The user is Standing " + midAngle;
+                P_N.Text = " ";
+                Emotion.Text = " ";
+            }
+            else
+            {
+                UserPresence.Text = "Please adjust the Kinect and retry " + midAngle;
+                P_N.Text = " ";
+                Emotion.Text = " ";
+            }
+                
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+       
+
+        void callMain()
         {
-            kinectSensorChooser1.Kinect.DepthStream.Disable();
-            kinectSensorChooser1.Kinect.ColorStream.Disable();
-            kinectSensorChooser1.Kinect.SkeletonStream.Disable();
-            StopKinect(kinectSensorChooser1.Kinect);
+           // getMidKnee();
+            checkUser();
+           
         }
+
+       
     }
 }
