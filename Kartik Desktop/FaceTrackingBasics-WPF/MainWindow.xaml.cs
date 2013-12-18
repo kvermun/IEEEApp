@@ -34,6 +34,12 @@ namespace FaceTrackingBasics
         private int count = 0, timesNodded = 0, timesShook = 0;
         private int isTilt = 0, isHeadDown = 0, isHeadAway = 0;
         private int[] guessState = new int[8];
+
+        private float midPitch = 0;
+        private float midYaw = 0;
+        private float midRoll = 0;
+
+        private int startCaliberate = 0;
         // 0 attentive
         // 1 distracted
         // 2 bored
@@ -129,83 +135,104 @@ namespace FaceTrackingBasics
         private void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
 
-            count++;
-
-            if (count % 3 == 0)
+            if (startCaliberate == 1)
             {
+                count++;
+                if (count == 90)
+                {
+
+                    count = 0;
+                    startCaliberate = 0;
+                    FaceCaliberateOperation(sender, e);
+                    midPitch /= 90;
+                    midRoll /= 90;
+                    midYaw /= 90;
+
+                    MessageBox.Show("Calibrated Pitch: " + midPitch + " Calibrated Roll: " + midRoll + " Calibrated Yaw: " + midYaw);
+                }
+                else
+                {
+                    FaceCaliberateOperation(sender, e);
+                }
+            }
+            else
+            {
+                count++;
+
                 FaceTrackOperation(sender, e);
-            }
+                
 
-            if (count == 30)
-            {
-                count = 0;
-
-                if (timesNodded >= 2)
+                if (count == 180)
                 {
-                    //textBox1.Text = "Nodding in Approval";
-                    guessState[6] += 5;
-                }
+                    count = 0;
 
-                if (timesShook >= 2)
-                {
-                    //textBox1.Text = "Shaking in Approval";
-                    guessState[7] += 5;
-                }
-
-                if (timesNodded < 2)
-                {
-                    if (isHeadDown == 1) {
-                        guessState[1] += 1;
-                        guessState[2] += 2;
-                        guessState[5] += 2;
-                    }
-                    if (isHeadDown == -1) 
+                    if (timesNodded >= 2)
                     {
-                        guessState[1] += 1;
-                        guessState[3] += 2;
-                        guessState[4] += 2;
-
+                        //textBox1.Text = "Nodding in Approval";
+                        guessState[6] += 5;
                     }
-                    if (isHeadDown == 0) 
+
+                    if (timesShook >= 2)
+                    {
+                        //textBox1.Text = "Shaking in Approval";
+                        guessState[7] += 5;
+                    }
+
+                    if (timesNodded < 2)
+                    {
+                        if (isHeadDown == 1)
+                        {
+                            guessState[1] += 1;
+                            guessState[2] += 2;
+                            guessState[5] += 2;
+                        }
+                        if (isHeadDown == -1)
+                        {
+                            guessState[1] += 1;
+                            guessState[3] += 2;
+                            guessState[4] += 2;
+
+                        }
+                        if (isHeadDown == 0)
+                        {
+                            guessState[0] += 2;
+                        }
+                    }
+
+                    if (timesShook < 2)
+                    {
+                        if (isHeadAway == 1 || isHeadAway == -1)
+                        {
+                            guessState[1] += 3;
+                            guessState[5] += 1;
+                            guessState[3] += 2;
+                        }
+                        else
+                        {
+                            guessState[0] += 2;
+                        }
+                    }
+
+                    if (isTilt == 0)
                     {
                         guessState[0] += 2;
                     }
-                }
-
-                if (timesShook < 2)
-                {
-                    if (isHeadAway == 1 || isHeadAway == -1)
+                    if (isTilt == 1 || isTilt == -1)
                     {
-                        guessState[1] += 3;
+                        guessState[0] += 1;
                         guessState[5] += 1;
-                        guessState[3] += 2;
+                        guessState[4] += 1;
+                        guessState[3] += 1;
                     }
-                    else
-                    {
-                        guessState[0] += 2;
-                    }
-                }
 
-                if (isTilt == 0)
-                {
-                    guessState[0] += 2;
+                    displayNote();
+                    isHeadAway = 0;
+                    isHeadDown = 0;
+                    isTilt = 0;
+                    timesShook = 0;
+                    timesNodded = 0;
                 }
-                if (isTilt == 1 || isTilt == -1)
-                {
-                    guessState[0] += 1;
-                    guessState[5] += 1;
-                    guessState[4] += 1;
-                    guessState[3] += 1;
-                }
-
-                displayNote();
-                isHeadAway = 0;
-                isHeadDown = 0;
-                isTilt = 0;
-                timesShook = 0;
-                timesNodded = 0;
             }
-            
         }
 
         private void displayNote()
@@ -255,9 +282,11 @@ namespace FaceTrackingBasics
                 textBox1.Text = "thinking";
             }
 
+            textBox1.Text += " count: " + count.ToString();
+
         }
 
-        private void FaceTrackOperation(object sender, AllFramesReadyEventArgs e)
+        private void FaceCaliberateOperation(object sender, AllFramesReadyEventArgs e)
         {
             using (var colorImageFrame = e.OpenColorImageFrame())
             {
@@ -335,47 +364,155 @@ namespace FaceTrackingBasics
                 var Yaw = faceRotation.Y;
                 var Roll = faceRotation.Z;
 
-                if (Pitch > 15 && isHeadDown <= 0)
+                midPitch += Pitch;
+                midRoll += Roll;
+                midYaw += Yaw;
+                
+            }
+        }
+
+        private void FaceTrackOperation(object sender, AllFramesReadyEventArgs e)
+        {
+            using (var colorImageFrame = e.OpenColorImageFrame())
+            {
+                if (colorImageFrame == null)
                 {
+                    return;
+                }
+
+                // Make a copy of the color frame for displaying.
+                var haveNewFormat = this.currentColorImageFormat != colorImageFrame.Format;
+                if (haveNewFormat)
+                {
+                    this.currentColorImageFormat = colorImageFrame.Format;
+                    this.colorImageData = new byte[colorImageFrame.PixelDataLength];
+                    this.colorImageWritableBitmap = new WriteableBitmap(
+                        colorImageFrame.Width, colorImageFrame.Height, 96, 96, PixelFormats.Bgr32, null);
+                    ColorImage.Source = this.colorImageWritableBitmap;
+                }
+
+                colorImageFrame.CopyPixelDataTo(this.colorImageData);
+                this.colorImageWritableBitmap.WritePixels(
+                    new Int32Rect(0, 0, colorImageFrame.Width, colorImageFrame.Height),
+                    this.colorImageData,
+                    colorImageFrame.Width * Bgr32BytesPerPixel,
+                    0);
+            }
+
+            using (ColorImageFrame colorImageFrame = e.OpenColorImageFrame())
+            {
+                if (colorImageFrame == null)
+                    return;
+                colorImageFrame.CopyPixelDataTo(colorPixelData);
+            }
+
+            using (DepthImageFrame depthImageFrame = e.OpenDepthImageFrame())
+            {
+                if (depthImageFrame == null)
+                    return;
+                depthImageFrame.CopyPixelDataTo(depthPixelData);
+            }
+
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrame == null)
+                    return;
+                skeletonFrame.CopySkeletonDataTo(skeletonData);
+            }
+
+            var skeleton = skeletonData.FirstOrDefault(s => s.TrackingState == SkeletonTrackingState.Tracked);
+            if (skeleton == null)
+                return;
+
+            FaceTrackFrame faceFrame = faceTracker.Track(sensorChooser.Kinect.ColorStream.Format, colorPixelData,
+                                            sensorChooser.Kinect.DepthStream.Format, depthPixelData,
+                                            skeleton);
+
+            // If a face is tracked, then we can use it.
+            if (faceFrame.TrackSuccessful)
+            {
+                // Retrieve only the Animation Units coeffs.
+
+                //CanvasTranslate.X = faceFrame.Translation.X;
+                //CanvasTranslate.Y = faceFrame.Translation.Y;
+                Vector3DF faceRotation = faceFrame.Rotation;
+
+                var AUCoeff = faceFrame.GetAnimationUnitCoefficients();
+
+                var jawLower = AUCoeff[AnimationUnit.JawLower];
+                var BrowLower = AUCoeff[AnimationUnit.BrowLower];
+                var BrowUpper = AUCoeff[AnimationUnit.BrowRaiser];
+                var lcd = AUCoeff[AnimationUnit.LipCornerDepressor];
+                var lipRaiser = AUCoeff[AnimationUnit.LipRaiser];
+                var lipStrectch = AUCoeff[AnimationUnit.LipStretcher];
+                var Pitch = faceRotation.X - midPitch;
+                var Yaw = faceRotation.Y - midYaw;
+                var Roll = faceRotation.Z - midRoll;
+
+                if (Pitch < midPitch + 10 && Pitch > midPitch - 10)
+                {
+                    isHeadDown = 0;
+                }
+                if (Roll < midRoll + 10 && Roll > midRoll - 10)
+                {
+                    isTilt = 0;
+                }
+                if (Yaw < midYaw + 10 && Yaw > midYaw - 10)
+                {
+                    isHeadAway = 0;
+                }
+
+                if (Pitch > midPitch+10)
+                {
+                    if (isHeadDown <= 0) timesNodded++;
                     isHeadDown = 1;
-                    timesNodded++;
+                    
                 }
-                if (Pitch < -15 && isHeadDown >= 0)
+                if (Pitch < midPitch-10)
                 {
+                    if (isHeadDown >= 0) timesNodded++;
                     isHeadDown = -1;
-                    timesNodded++;
+                    //timesNodded++;
                 }
 
-                if (Yaw > 5 && isHeadAway <= 0)
+                if (Yaw > midYaw+10 )
                 {
+                    if (isHeadAway <= 0) timesShook++;
                     isHeadAway = 1;
-                    timesShook++;
+                    //timesShook++;
                 }
-                if (Yaw < -25 && isHeadAway >= 0)
+                if (Yaw < midYaw-10 )
                 {
+                    if (isHeadAway >= 0) timesShook++;
                     isHeadAway = -1;
-                    timesShook++;
+                    //timesShook++;
                 }
 
-                if (Roll > 20 && isTilt <= 0)
+                if (Roll > midRoll+10)
                 {
                     isTilt = 1;
                     //timesShook++;
                 }
-                if (Yaw < -20 && isHeadAway >= 0)
+                if (Roll < midRoll-10)
                 {
                     isTilt = -1;
                     //timesShook++;
                 }
 
-                //textBox1.Text = "P: " + ((float)Pitch).ToString() + " Y: " + ((float)Yaw).ToString() + " R: " + ((float)Roll).ToString();
+                textBox2.Text = "P: " + ((float)Pitch).ToString() + " Y: " + ((float)Yaw).ToString() + " R: " + ((float)Roll).ToString();
                 //textBox2.Text = "JL: " + ((float)jawLower).ToString() + " BL: " + ((float)BrowLower).ToString() + " BU: " + ((float)BrowUpper).ToString();
                 //dataToBeSent3 = "lcd: " + ((float)lcd).ToString() + " LR: " + ((float)lipRaiser).ToString() + " LS: " + ((float)lipStrectch).ToString();
 
                 //pitch(nod) - +-15 roll(tilt) - +-20 yaw(shaking offs- -10) +-15
-
+                textBox2.Text += " isTilt " + isTilt + " isHeadAway " + isHeadAway + " isHeadDown " + isHeadDown;
             }
 
+        }
+
+        private void caliberate_Click(object sender, RoutedEventArgs e)
+        {
+            startCaliberate = 1;
+            count = 0;
         }
     }
 }
