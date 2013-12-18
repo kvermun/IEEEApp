@@ -13,7 +13,7 @@ using Microsoft.Kinect.Toolkit.FaceTracking;
 namespace IEEEApp
 {
 
-    
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -33,14 +33,11 @@ namespace IEEEApp
         {
             InitializeComponent();
 
-            var faceTrackingViewerBinding = new Binding("Kinect") { Source = sensorChooser };
-            faceTrackingViewer.SetBinding(FaceTrackingViewer.KinectProperty, faceTrackingViewerBinding);
-
             sensorChooser.KinectChanged += SensorChooserOnKinectChanged;
 
             sensorChooser.Start();
 
-            
+
         }
 
         private void SensorChooserOnKinectChanged(object sender, KinectChangedEventArgs kinectChangedEventArgs)
@@ -85,7 +82,7 @@ namespace IEEEApp
                     skeletonData = new Skeleton[6];
 
                     faceTracker = new FaceTracker(newSensor);
-                    
+
                     newSensor.AllFramesReady += KinectSensorOnAllFramesReady;
 
 
@@ -108,11 +105,12 @@ namespace IEEEApp
         private void WindowClosed(object sender, EventArgs e)
         {
             sensorChooser.Stop();
-            faceTrackingViewer.Dispose();
+            //faceTrackingViewer.Dispose();
         }
 
         private void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
+            
             using (var colorImageFrame = e.OpenColorImageFrame())
             {
                 if (colorImageFrame == null)
@@ -130,7 +128,7 @@ namespace IEEEApp
                     this.colorImageData = new byte[colorImageFrame.PixelDataLength];
                     this.colorImageWritableBitmap = new WriteableBitmap(
                         colorImageFrame.Width, colorImageFrame.Height, 96, 96, PixelFormats.Bgr32, null);
-                    ColorImage.Source = this.colorImageWritableBitmap;
+                    //ColorImage.Source = this.colorImageWritableBitmap;
                 }
 
                 colorImageFrame.CopyPixelDataTo(this.colorImageData);
@@ -142,12 +140,12 @@ namespace IEEEApp
 
             }
 
-            /*using (ColorImageFrame colorImageFrame = e.OpenColorImageFrame())
+            using (ColorImageFrame colorImageFrame = e.OpenColorImageFrame())
             {
                 if (colorImageFrame == null)
                     return;
                 colorImageFrame.CopyPixelDataTo(colorPixelData);
-            }*/
+            }
 
             using (DepthImageFrame depthImageFrame = e.OpenDepthImageFrame())
             {
@@ -171,10 +169,10 @@ namespace IEEEApp
                 return;
 
             // Make the faceTracker processing the data.
-            FaceTrackFrame faceFrame = faceTracker.Track(kinectSensorChooser1.Kinect.ColorStream.Format, this.colorImageData,
+            FaceTrackFrame faceFrame = faceTracker.Track(kinectSensorChooser1.Kinect.ColorStream.Format, colorPixelData,
                                               kinectSensorChooser1.Kinect.DepthStream.Format, depthPixelData,
                                               skeleton);
-
+            
             if (faceFrame.TrackSuccessful)
             {
                 
@@ -192,6 +190,9 @@ namespace IEEEApp
                 var Yaw = faceRotation.Y;
                 var Roll = faceRotation.Z;
 
+                textBox1.Text = "P: " + ((float)Pitch).ToString() + " Y: " + ((float)Yaw).ToString() + " R: " + ((float)Roll).ToString();
+                textBox2.Text = "JL: " + ((float)jawLower).ToString() + " BL: " + ((float)BrowLower).ToString() + " BU: " + ((float)BrowUpper).ToString();
+                textBox1.Text = "lcd: " + ((float)lcd).ToString() + " LR: " + ((float)lipRaiser).ToString() + " LS: " +((float)lipStrectch).ToString();
             }
 
         }
@@ -207,3 +208,6 @@ namespace IEEEApp
         }
     }
 }
+
+
+
