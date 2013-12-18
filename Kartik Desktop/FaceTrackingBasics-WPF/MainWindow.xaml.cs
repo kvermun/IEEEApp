@@ -31,6 +31,17 @@ namespace FaceTrackingBasics
         private byte[] colorPixelData;
         private short[] depthPixelData;
         private Skeleton[] skeletonData;
+        private int count = 0, timesNodded = 0, timesShook = 0;
+        private int isTilt = 0, isHeadDown = 0, isHeadAway = 0;
+        private int[] guessState = new int[8];
+        // 0 attentive
+        // 1 distracted
+        // 2 bored
+        // 3 sad
+        // 4 tired/sleepy
+        // 5 thinking
+        // 6 nodding in approval
+        // 7 shaking in disapproval
 
         public MainWindow()
         {
@@ -42,6 +53,11 @@ namespace FaceTrackingBasics
             sensorChooser.KinectChanged += SensorChooserOnKinectChanged;
 
             sensorChooser.Start();
+
+            for (int i = 0; i < 8; i++)
+            {
+                guessState[i] = 0;
+            }
         }
 
         private void SensorChooserOnKinectChanged(object sender, KinectChangedEventArgs kinectChangedEventArgs)
@@ -112,6 +128,137 @@ namespace FaceTrackingBasics
 
         private void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
+
+            count++;
+
+            if (count % 3 == 0)
+            {
+                FaceTrackOperation(sender, e);
+            }
+
+            if (count == 30)
+            {
+                count = 0;
+
+                if (timesNodded >= 2)
+                {
+                    //textBox1.Text = "Nodding in Approval";
+                    guessState[6] += 5;
+                }
+
+                if (timesShook >= 2)
+                {
+                    //textBox1.Text = "Shaking in Approval";
+                    guessState[7] += 5;
+                }
+
+                if (timesNodded < 2)
+                {
+                    if (isHeadDown == 1) {
+                        guessState[1] += 1;
+                        guessState[2] += 2;
+                        guessState[5] += 2;
+                    }
+                    if (isHeadDown == -1) 
+                    {
+                        guessState[1] += 1;
+                        guessState[3] += 2;
+                        guessState[4] += 2;
+
+                    }
+                    if (isHeadDown == 0) 
+                    {
+                        guessState[0] += 2;
+                    }
+                }
+
+                if (timesShook < 2)
+                {
+                    if (isHeadAway == 1 || isHeadAway == -1)
+                    {
+                        guessState[1] += 3;
+                        guessState[5] += 1;
+                        guessState[3] += 2;
+                    }
+                    else
+                    {
+                        guessState[0] += 2;
+                    }
+                }
+
+                if (isTilt == 0)
+                {
+                    guessState[0] += 2;
+                }
+                if (isTilt == 1 || isTilt == -1)
+                {
+                    guessState[0] += 1;
+                    guessState[5] += 1;
+                    guessState[4] += 1;
+                    guessState[3] += 1;
+                }
+
+                displayNote();
+                isHeadAway = 0;
+                isHeadDown = 0;
+                isTilt = 0;
+                timesShook = 0;
+                timesNodded = 0;
+            }
+            
+        }
+
+        private void displayNote()
+        {
+            if (guessState[0] == 6)
+            {
+                textBox1.Text = "Very Attentive";
+            }
+
+            if (guessState[0] == 5)
+            {
+                textBox1.Text = "Somewhat Attentive. May be tired.";
+            }
+
+            if (guessState[1] > 2)
+            {
+                textBox1.Text = "Distracted";
+            }
+
+            if (guessState[6] == 5)
+            {
+                textBox1.Text = "Nodding in Approval.";
+            }
+
+            if (guessState[7] == 5)
+            {
+                textBox1.Text = "Shaking in disapproval.";
+            }
+
+            if (guessState[2] >= 3)
+            {
+                textBox1.Text = "Bored";
+            }
+
+            if (guessState[3] >= 3)
+            {
+                textBox1.Text = "Sad";
+            }
+
+            if (guessState[4] >= 3)
+            {
+                textBox1.Text = "Tired/Sleepy";
+            }
+
+            if (guessState[5] >= 3)
+            {
+                textBox1.Text = "thinking";
+            }
+
+        }
+
+        private void FaceTrackOperation(object sender, AllFramesReadyEventArgs e)
+        {
             using (var colorImageFrame = e.OpenColorImageFrame())
             {
                 if (colorImageFrame == null)
@@ -171,7 +318,7 @@ namespace FaceTrackingBasics
             if (faceFrame.TrackSuccessful)
             {
                 // Retrieve only the Animation Units coeffs.
-                
+
                 //CanvasTranslate.X = faceFrame.Translation.X;
                 //CanvasTranslate.Y = faceFrame.Translation.Y;
                 Vector3DF faceRotation = faceFrame.Rotation;
@@ -188,14 +335,47 @@ namespace FaceTrackingBasics
                 var Yaw = faceRotation.Y;
                 var Roll = faceRotation.Z;
 
+                if (Pitch > 15 && isHeadDown <= 0)
+                {
+                    isHeadDown = 1;
+                    timesNodded++;
+                }
+                if (Pitch < -15 && isHeadDown >= 0)
+                {
+                    isHeadDown = -1;
+                    timesNodded++;
+                }
 
+                if (Yaw > 5 && isHeadAway <= 0)
+                {
+                    isHeadAway = 1;
+                    timesShook++;
+                }
+                if (Yaw < -25 && isHeadAway >= 0)
+                {
+                    isHeadAway = -1;
+                    timesShook++;
+                }
 
-                textBox1.Text = "P: " + ((float)Pitch).ToString() + " Y: " + ((float)Yaw).ToString() + " R: " + ((float)Roll).ToString();
-                textBox2.Text = "JL: " + ((float)jawLower).ToString() + " BL: " + ((float)BrowLower).ToString() + " BU: " + ((float)BrowUpper).ToString();
+                if (Roll > 20 && isTilt <= 0)
+                {
+                    isTilt = 1;
+                    //timesShook++;
+                }
+                if (Yaw < -20 && isHeadAway >= 0)
+                {
+                    isTilt = -1;
+                    //timesShook++;
+                }
+
+                //textBox1.Text = "P: " + ((float)Pitch).ToString() + " Y: " + ((float)Yaw).ToString() + " R: " + ((float)Roll).ToString();
+                //textBox2.Text = "JL: " + ((float)jawLower).ToString() + " BL: " + ((float)BrowLower).ToString() + " BU: " + ((float)BrowUpper).ToString();
                 //dataToBeSent3 = "lcd: " + ((float)lcd).ToString() + " LR: " + ((float)lipRaiser).ToString() + " LS: " + ((float)lipStrectch).ToString();
+
+                //pitch(nod) - +-15 roll(tilt) - +-20 yaw(shaking offs- -10) +-15
+
             }
 
-            
         }
     }
 }
