@@ -31,7 +31,7 @@ namespace FaceTrackingBasics
         private byte[] colorPixelData;
         private short[] depthPixelData;
         private Skeleton[] skeletonData;
-        private int count = 0, timesNodded = 0, timesShook = 0;
+        private int count = 0, timesNodded = 0, timesShook = 0, timesTilted = 0;
         private int isTilt = 0, isHeadDown = 0, isHeadAway = 0;
         private int[] guessState = new int[8];
 
@@ -160,9 +160,11 @@ namespace FaceTrackingBasics
                 count++;
 
                 FaceTrackOperation(sender, e);
+
+
                 
 
-                if (count == 180)
+                /*if (count == 180)
                 {
                     count = 0;
 
@@ -231,7 +233,7 @@ namespace FaceTrackingBasics
                     isTilt = 0;
                     timesShook = 0;
                     timesNodded = 0;
-                }
+                }*/
             }
         }
 
