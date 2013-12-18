@@ -12,5 +12,14 @@
         <Label Content="User Presence" Height="39" HorizontalAlignment="Left" Margin="12,384,0,0" Name="userLabel" VerticalAlignment="Top" Width="186" FontSize="18" />
         <Label Content="Postive/Negative" Height="47" HorizontalAlignment="Left" Margin="12,490,0,0" Name="label1" VerticalAlignment="Top" Width="186" FontSize="18" />
         <Label Content="Emotion" Height="42" HorizontalAlignment="Left" Margin="375,484,0,0" Name="label2" VerticalAlignment="Top" Width="186" FontSize="18" />
+        <Label Content="Label" Height="28" HorizontalAlignment="Left" Margin="493,527,0,0" Name="label3" VerticalAlignment="Top" />
+        <Label Content="LElbow" Height="28" HorizontalAlignment="Left" Margin="375,395,0,0" Name="caLabel" VerticalAlignment="Top" Width="73" />
+        <TextBox FontSize="16" FontWeight="Bold" Height="36" HorizontalAlignment="Right" Margin="0,429,289,0" Name="ca" VerticalAlignment="Top" Width="73" />
+        <TextBox FontSize="16" FontWeight="Bold" Height="36" HorizontalAlignment="Left" Margin="550,429,0,0" Name="ca2" VerticalAlignment="Top" Width="73" />
+        <TextBox FontSize="16" FontWeight="Bold" Height="36" HorizontalAlignment="Left" Margin="629,429,0,0" Name="ca3" VerticalAlignment="Top" Width="73" />
+        <TextBox FontSize="16" FontWeight="Bold" Height="36" HorizontalAlignment="Left" Margin="464,429,0,0" Name="ca1" VerticalAlignment="Top" Width="73" />
+        <Label Content="RHand" Height="28" HorizontalAlignment="Left" Margin="629,395,0,0" Name="label4" VerticalAlignment="Top" Width="73" />
+        <Label Content="LHand" Height="28" HorizontalAlignment="Left" Margin="550,395,0,0" Name="label5" VerticalAlignment="Top" Width="73" />
+        <Label Content="RElbow" Height="28" HorizontalAlignment="Left" Margin="458,395,0,0" Name="label6" VerticalAlignment="Top" Width="73" />
     </Grid>
 </Window>

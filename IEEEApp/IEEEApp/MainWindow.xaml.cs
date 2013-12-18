@@ -24,14 +24,15 @@ namespace IEEEApp
         {
             InitializeComponent();
         }
-
+       static  int  count = 0;
         const int skeletonCount = 6;
         Skeleton[] allSkeletons = new Skeleton[skeletonCount];
         Skeleton first;
         SkeletonPoint KneeCentre;
-        Joint MidKnee;
-        double rightAngle, leftAngle, midAngle, bendAngle = 90, sitAngle = 110, standAngle = 160, thresh1 = 20.0f, thresh2 = 15.0f;
-
+        //Joint MidKnee;
+        double rightAngle, leftAngle, midAngle, centralAngle, bendAngle = 80, sitAngle = 110, standAngle = 160, thresh1 = 20.0f, thresh2 = 15.0f, straightAngle = 180, thresh3 = 10.0f;
+        double leftElbowElevation, rightElbowElevation, leftHandElevation, rightHandElevation;
+        int boredomCount = 0,;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
@@ -59,14 +60,21 @@ namespace IEEEApp
 
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            first = GetFirstSkeleton(e);
+           // count += 1;
+          //  if (count == 120)
+          //  {
 
-            if (first == null)
-            {
-                return;
-            }
+                ca3.Text = count.ToString();
+                count = 0;
+                first = GetFirstSkeleton(e);
 
-            callMain();
+                if (first == null)
+                {
+                    return;
+                }
+                count = 0;
+                callMain();
+           // }
         }
 
         private void StopKinect(KinectSensor sensor)
@@ -117,7 +125,7 @@ namespace IEEEApp
         {
             double angle = 0;
             double value = CalcDiff();
-            value = 0.3 * value;
+            value = 0.38 * value;
             double shrhX = shoulder.Position.X - hip.Position.X;
             double shrhY = shoulder.Position.Y - (hip.Position.Y - value);
             double shrhZ = shoulder.Position.Z - hip.Position.Z;
@@ -151,11 +159,11 @@ namespace IEEEApp
             return value;
         }
       
-        double CalculateAngle2D(Joint shoulder, Joint hip, Joint knee)
+        double CalculateAngle2D_YZ(Joint shoulder, Joint hip, Joint knee)
         {
             double angle = 0;
             double value = CalcDiff();
-            value = 0.3 * value;
+            value = 0.4 * value;
             double shrhY = shoulder.Position.Y - (hip.Position.Y-value);
             double shrhZ = shoulder.Position.Z - hip.Position.Z;
             double hsl = vectorNorm( shrhY, shrhZ);
@@ -182,11 +190,12 @@ namespace IEEEApp
         }
 
 
-        double CalculateAngle2D(Joint shoulder, Joint hip, SkeletonPoint knee)
+
+     /*   double CalculateAngle2D_YZ(Joint shoulder, Joint hip, SkeletonPoint knee)
         {
             double angle = 0;
             double value = CalcDiff();
-            value = 0.3 * value;
+            value = 0.32 * value;
             double shrhY = shoulder.Position.Y - (hip.Position.Y - value);
             double shrhZ = shoulder.Position.Z - hip.Position.Z;
             double hsl = vectorNorm(shrhY, shrhZ);
@@ -211,12 +220,41 @@ namespace IEEEApp
 
             return angle;
         }
+*/
+
+        double CalculateAngle2D_XY(Joint head, Joint ShoulderCenter, Joint spine)
+        {
+            double angle = 0;
+            double shrhX = head.Position.X - ShoulderCenter.Position.X;
+            double shrhY = head.Position.Y - (ShoulderCenter.Position.Y);
+            double hsl = vectorNorm(shrhX, shrhY);
+            double unrhX = spine.Position.X - ShoulderCenter.Position.X;
+            double unrhY = spine.Position.Y - (ShoulderCenter.Position.Y);
+            double hul = vectorNorm(unrhX, unrhY);
+            double mhshu = shrhX * unrhX + shrhY * unrhY;
+
+            double x = mhshu / (hul * hsl);
+            if (x != Double.NaN)
+            {
+                if (-1 <= x && x <= 1)
+                {
+                    double angleRad = Math.Acos(x);
+                    angle = angleRad * (180.0 / 3.1416);
+                }
+                else
+                    angle = 0;
+            }
+            else
+                angle = 0;
+
+            return angle;
+        }
 
         double CalculateAngle3D(Joint shoulder, Joint hip, Joint knee)
         {
             double angle = 0;
             double value = CalcDiff();
-            value = 0.3 * value;
+            value = 0.32 * value;
             double shrhX = shoulder.Position.X - hip.Position.X;
             double shrhY = shoulder.Position.Y - (hip.Position.Y - value);
             double shrhZ = shoulder.Position.Z - hip.Position.Z;
@@ -270,21 +308,51 @@ namespace IEEEApp
 
         void checkUser()
         {
-            rightAngle = CalculateAngle2D(first.Joints[JointType.ShoulderLeft], first.Joints[JointType.HipLeft], first.Joints[JointType.KneeLeft]);
-            leftAngle = CalculateAngle2D(first.Joints[JointType.ShoulderRight], first.Joints[JointType.HipRight], first.Joints[JointType.KneeRight]);
+            rightAngle = CalculateAngle2D_YZ(first.Joints[JointType.ShoulderLeft], first.Joints[JointType.HipLeft], first.Joints[JointType.KneeLeft]);
+            leftAngle = CalculateAngle2D_YZ(first.Joints[JointType.ShoulderRight], first.Joints[JointType.HipRight], first.Joints[JointType.KneeRight]);
+            centralAngle = CalculateAngle2D_XY(first.Joints[JointType.Spine], first.Joints[JointType.ShoulderCenter], first.Joints[JointType.Head]);
             // double midAngle = CalculateAngle2D(first.Joints[JointType.ShoulderCenter], first.Joints[JointType.HipCenter], KneeCentre);
             midAngle = (rightAngle + leftAngle) / 2;
-
+            leftElbowElevation = first.Joints[JointType.ElbowLeft].Position.Y - first.Joints[JointType.ShoulderCenter].Position.Y;
+            rightElbowElevation = first.Joints[JointType.ElbowRight].Position.Y - first.Joints[JointType.ShoulderCenter].Position.Y;
+            leftHandElevation = first.Joints[JointType.HandLeft].Position.Y - first.Joints[JointType.ShoulderCenter].Position.Y;
+            rightHandElevation = first.Joints[JointType.HandRight].Position.Y - first.Joints[JointType.ShoulderCenter].Position.Y;
             if (midAngle <= sitAngle + thresh1 && midAngle >= sitAngle - thresh1)
             {
-                UserPresence.Text = "The user is Sitting " + midAngle;
-                P_N.Text = " Positive " ;
-                Emotion.Text = " Neutral " ;
+                if (centralAngle <= straightAngle + thresh3 && centralAngle >= straightAngle - thresh3)
+                {
+                    if (leftElbowElevation >= -0.1 && rightElbowElevation >= -0.1 && leftHandElevation >= -0.1 && rightHandElevation >= -0.1)
+                    {
+                        UserPresence.Text = "The user is Sitting " + midAngle;
+                        P_N.Text = " Negative (both hand above";
+                        Emotion.Text = " Bored ";
+                    }
+                    else if ((leftHandElevation >= -0.1 || rightHandElevation >= -0.1) && leftElbowElevation < 0 && rightElbowElevation < 0)
+                    {
+                        UserPresence.Text = "The user is Sitting " + midAngle;
+                        P_N.Text = " Negative (hand on chin ";
+                        Emotion.Text = " Uncertainity/Puzzled/Anxiety";
+                    }
+                    else
+                    {
+                        UserPresence.Text = "The user is Sitting " + midAngle;
+                        P_N.Text = " Positive (sitting";
+                        Emotion.Text = " Neutral ";
+                    }
+                }
+                else
+                {
+                    UserPresence.Text = "The user is Sitting " + midAngle;
+                    P_N.Text = " Negative (head on side";
+                    Emotion.Text = " Uncertainity/Puzzled/Anxiety";
+
+                }
+                
             }
             else if (midAngle <= bendAngle + thresh2 && midAngle >= bendAngle - thresh2)
             {
                 UserPresence.Text = "The user is Sitting " + midAngle;
-                P_N.Text = " Positive ";
+                P_N.Text = " Positive (bendin";
                 Emotion.Text = " Enthusiastic ";
             }
             else if (midAngle <= standAngle + thresh1 && midAngle >= standAngle - thresh1)
@@ -299,6 +367,7 @@ namespace IEEEApp
                 P_N.Text = " ";
                 Emotion.Text = " ";
             }
+
                 
         }
 
