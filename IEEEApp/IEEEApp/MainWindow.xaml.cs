@@ -32,7 +32,7 @@ namespace IEEEApp
         //Joint MidKnee;
         double rightAngle, leftAngle, midAngle, centralAngle, bendAngle = 80, sitAngle = 110, standAngle = 160, thresh1 = 20.0f, thresh2 = 15.0f, straightAngle = 180, thresh3 = 10.0f;
         double leftElbowElevation, rightElbowElevation, leftHandElevation, rightHandElevation;
-        int boredomCount = 0,;
+        int boredomCount = 0;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Console.WriteLine("hello");
