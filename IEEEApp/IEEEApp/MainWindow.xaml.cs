@@ -34,6 +34,7 @@ namespace IEEEApp
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            Console.WriteLine("hello");
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
         }
 
@@ -222,7 +223,7 @@ namespace IEEEApp
             double shrhZ = shoulder.Position.Z - hip.Position.Z;
             double hsl = vectorNorm(shrhX, shrhY, shrhZ);
             double unrhX = knee.Position.X - hip.Position.X;
-            double unrhY = knee.Position.Y - (hip.Position.Y - value);
+            double unrhY = knee.Position.Y -  (hip.Position.Y - value);
             double unrhZ = knee.Position.Z - hip.Position.Z;
             double hul = vectorNorm(unrhX, unrhY, unrhZ);
             double mhshu = shrhX * unrhX + shrhY * unrhY + shrhZ * unrhZ;
