@@ -34,6 +34,7 @@ namespace FaceTrackingBasics
         private int count = 0, timesNodded = 0, timesShook = 0, timesTilted = 0;
         private int isTilt = 0, isHeadDown = 0, isHeadAway = 0;
         private int[] guessState = new int[8];
+        private int[] state = new int[9];
 
         private float midPitch = 0;
         private float midYaw = 0;
@@ -63,7 +64,9 @@ namespace FaceTrackingBasics
             for (int i = 0; i < 8; i++)
             {
                 guessState[i] = 0;
+                state[i] = 0;
             }
+            state[8] = 0;
         }
 
         private void SensorChooserOnKinectChanged(object sender, KinectChangedEventArgs kinectChangedEventArgs)
@@ -157,11 +160,24 @@ namespace FaceTrackingBasics
             }
             else
             {
-                count++;
-
+                //count++;
+                //if (count == 60)
+                //{
+                   // displayNote1();
+                   // count = 0;
+                   // for (int i = 0; i < 9; i++)
+                   // {
+                    //    state[i] = 0;
+                   // }
+                //}
                 FaceTrackOperation(sender, e);
 
-
+                displayNote1();
+                count = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    state[i] = 0;
+                }
                 
 
                 /*if (count == 180)
@@ -235,6 +251,52 @@ namespace FaceTrackingBasics
                     timesNodded = 0;
                 }*/
             }
+        }
+
+        private void displayNote1()
+        {
+            int maxOccur = 0, maxState = 0;
+
+            for (int i = 0; i < 9; i++)
+            {
+                if (state[i] > maxOccur)
+                {
+                    maxOccur = state[i];
+                    maxState = i;
+                }
+            }
+
+            if (maxState == 1)
+            {
+                textBox1.Text = "Straight face";
+                textBox2.Text = "Attentive";
+                textBox3.Text = "Keep it up.";
+            }
+            if (maxState == 0)
+            {
+                textBox1.Text = "Face Upwards";
+                textBox2.Text = "Thinking/contemplative.";
+                textBox3.Text = "If you have any doubts please ask.";
+            }
+            if (maxState == 2)
+            {
+                textBox1.Text = "Face Downwards";
+                textBox2.Text = "Distracted/disinterested";
+                textBox3.Text = "Perhaps we will study another time.";
+            }
+            if (maxState == 3 || maxState == 5)
+            {
+                textBox1.Text = "Facing away";
+                textBox2.Text = "Distracted";
+                textBox3.Text = "Please pay attention.";
+            }
+            if (maxState == 6 || maxState == 8)
+            {
+                textBox1.Text = "Tilted";
+                textBox2.Text = "May be tired/sleepy";
+                textBox3.Text = "Take a coffee break.";
+            }
+
         }
 
         private void displayNote()
@@ -454,26 +516,31 @@ namespace FaceTrackingBasics
                 if (Pitch < midPitch + 10 && Pitch > midPitch - 10)
                 {
                     isHeadDown = 0;
+                    state[1] += 3;
                 }
                 if (Roll < midRoll + 10 && Roll > midRoll - 10)
                 {
                     isTilt = 0;
+                    state[1]++;
                 }
                 if (Yaw < midYaw + 10 && Yaw > midYaw - 10)
                 {
                     isHeadAway = 0;
+                    state[1]++;
                 }
 
                 if (Pitch > midPitch+10)
                 {
                     if (isHeadDown <= 0) timesNodded++;
                     isHeadDown = 1;
+                    state[0]+=3;
                     
                 }
                 if (Pitch < midPitch-10)
                 {
                     if (isHeadDown >= 0) timesNodded++;
                     isHeadDown = -1;
+                    state[2]+=3;
                     //timesNodded++;
                 }
 
@@ -481,6 +548,7 @@ namespace FaceTrackingBasics
                 {
                     if (isHeadAway <= 0) timesShook++;
                     isHeadAway = 1;
+                    state[3]+=3;
                     //timesShook++;
                 }
                 if (Yaw < midYaw-10 )
@@ -488,25 +556,28 @@ namespace FaceTrackingBasics
                     if (isHeadAway >= 0) timesShook++;
                     isHeadAway = -1;
                     //timesShook++;
+                    state[5]+=3;
                 }
 
                 if (Roll > midRoll+10)
                 {
+                    state[6]+=3;
                     isTilt = 1;
                     //timesShook++;
                 }
                 if (Roll < midRoll-10)
                 {
+                    state[8]+=3;
                     isTilt = -1;
                     //timesShook++;
                 }
 
-                textBox2.Text = "P: " + ((float)Pitch).ToString() + " Y: " + ((float)Yaw).ToString() + " R: " + ((float)Roll).ToString();
+                //textBox2.Text = "P: " + ((float)Pitch).ToString() + " Y: " + ((float)Yaw).ToString() + " R: " + ((float)Roll).ToString();
                 //textBox2.Text = "JL: " + ((float)jawLower).ToString() + " BL: " + ((float)BrowLower).ToString() + " BU: " + ((float)BrowUpper).ToString();
                 //dataToBeSent3 = "lcd: " + ((float)lcd).ToString() + " LR: " + ((float)lipRaiser).ToString() + " LS: " + ((float)lipStrectch).ToString();
 
                 //pitch(nod) - +-15 roll(tilt) - +-20 yaw(shaking offs- -10) +-15
-                textBox2.Text += " isTilt " + isTilt + " isHeadAway " + isHeadAway + " isHeadDown " + isHeadDown;
+                //textBox2.Text += " isTilt " + isTilt + " isHeadAway " + isHeadAway + " isHeadDown " + isHeadDown;
             }
 
         }
