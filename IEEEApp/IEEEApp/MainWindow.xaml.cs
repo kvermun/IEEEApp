@@ -30,12 +30,12 @@ namespace IEEEApp
         Skeleton first;
         SkeletonPoint KneeCentre;
         //Joint MidKnee;
-        double rightAngle, leftAngle, midAngle, centralAngle, bendAngle = 80, sitAngle = 105, standAngle = 160, thresh1 = 20.0f, thresh2 = 5.0f, straightAngle = 180, thresh3 = 10.0f;
+        double rightAngle, leftAngle, midAngle, centralAngle, bendAngle = 80, sitAngle = 105, standAngle = 160, thresh1 = 20.0f, thresh2 = 5.0f, straightAngle = 180, thresh3 = 15.0f;
         double leftElbowElevation, rightElbowElevation, leftHandElevation, rightHandElevation;
         int boredomCount = 0;
         int EnthuCount = 0;
         int anxietyCount = 0;
-        int thresh4 = 90;
+        int thresh4 = 60;
         int fatigueCount = 0;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -328,58 +328,58 @@ namespace IEEEApp
                 {
                     if (leftElbowElevation >= -0.1 && rightElbowElevation >= -0.1 && leftHandElevation >= -0.1 && rightHandElevation >= -0.1)
                     {
-                        UserPresence.Text = "The user is Sitting " + midAngle;
+                        UserPresence.Text = "The user is Sitting ";// +midAngle;
                      //   P_N.Text = " Negative (both hand above";
-                        Emotion.Text = " Bored ";
+                   
                         boredomCount++;
                     }
                     else if ((leftHandElevation >= -0.1 || rightHandElevation >= -0.1) && leftElbowElevation < 0 && rightElbowElevation < 0)
                     {
-                        UserPresence.Text = "The user is Sitting " + midAngle;
+                        UserPresence.Text = "The user is Sitting ";// +midAngle;
                       //  P_N.Text = " Negative (hand on chin ";
-                        Emotion.Text = " Uncertainity/Puzzled/Anxiety";
+                        
                         anxietyCount++;
                     }
                     else
                     {
-                        UserPresence.Text = "The user is Sitting " + midAngle;
+                        UserPresence.Text = "The user is Sitting ";// +midAngle;
                       //  P_N.Text = " Positive (sitting";
-                        Emotion.Text = " Neutral ";
+                        EnthuCount++;
                     }
                 }
                 else
                 {
-                    UserPresence.Text = "The user is Sitting " + midAngle;
+                    UserPresence.Text = "The user is Sitting ";// +midAngle;
                   //  P_N.Text = " Negative (head on side";
-                    Emotion.Text = " Uncertainity/Puzzled/Anxiety";
+                    
                     anxietyCount++;
                 }
                 
             }
             else if (midAngle <= bendAngle + thresh2 && midAngle >= bendAngle - thresh2-10)
             {
-                UserPresence.Text = "The user is Sitting " + midAngle;
+                UserPresence.Text = "The user is Sitting ";// +midAngle;
                 //P_N.Text = " Positive (bendin";
-                Emotion.Text = " Enthusiastic ";
+    
                // txtOutput.Content = midAngle.ToString();
                 EnthuCount++;
             }
             else if (midAngle <= standAngle + thresh1 && midAngle >= standAngle - thresh1)
             {
-                UserPresence.Text = "The user is Standing " + midAngle;
+                UserPresence.Text = "The user is Standing ";// +midAngle;
                // P_N.Text = " ";
                 Emotion.Text = " ";
             }
             else if (midAngle > sitAngle  && midAngle <= standAngle - thresh1)
             {
-                UserPresence.Text = "The user is Sitting " + midAngle;
+                UserPresence.Text = "The user is Sitting ";// +midAngle;
                 //   P_N.Text = " Negative (both hand above";
-                Emotion.Text = " Fatigue ";
+                
                 fatigueCount++;
             }
             else
             {
-                UserPresence.Text = "Please adjust the Kinect and retry " + midAngle;
+                txtOutput.Content = UserPresence.Text = "Please adjust the Kinect or yourself!! ";// +midAngle;
                 // P_N.Text = " ";
                 Emotion.Text = " ";
             }
@@ -391,6 +391,9 @@ namespace IEEEApp
 
         void callMain()
         {
+            txtOutput.FontSize = 28;
+            Emotion.FontSize = 28;
+            UserPresence.FontSize = 28;
            // getMidKnee();
             if ((boredomCount) >= thresh4)
             {
@@ -398,7 +401,8 @@ namespace IEEEApp
                 EnthuCount = 0;
                 anxietyCount = 0;
                 boredomCount = 0;
-                txtOutput.Content =  "You are not focussing. You should get focussed";
+                Emotion.Text = " Bored ";
+                txtOutput.Content = "Boring!! Go and get some break.";
             }
             else if ((anxietyCount ) >= thresh4)
             {
@@ -406,7 +410,8 @@ namespace IEEEApp
                 EnthuCount = 0;
                 anxietyCount = 0;
                 boredomCount = 0;
-                txtOutput.Content = "Try to relaxed. Calm down.";
+                Emotion.Text = " Uncertainity/Puzzled/Anxiety";
+                txtOutput.Content = "You are not focussing. You should get focussed";
             }
             else if ((EnthuCount) >= thresh4)
             {
@@ -414,6 +419,7 @@ namespace IEEEApp
                 EnthuCount = 0;
                 anxietyCount = 0;
                 boredomCount = 0;
+                Emotion.Text = " Keen learner ";
                 txtOutput.Content =  "Good concentration!! You are a keen learner. Keep it on.";
             }
             else if((fatigueCount) >= thresh4)
@@ -422,7 +428,8 @@ namespace IEEEApp
                 EnthuCount = 0;
                 anxietyCount = 0;
                 boredomCount = 0;
-                txtOutput.Content = "Go and get some break.";
+                Emotion.Text = " Fatigue ";
+                txtOutput.Content = "Tired!! Go and get some break.";
             }
             checkUser();
             
