@@ -1,15 +1,15 @@
 ﻿<Window x:Class="IEEEApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="647" Width="759" xmlns:my="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="MainWindow" Height="747" Width="1024" xmlns:my="clr-namespace:Microsoft.Samples.Kinect.WpfViewers;assembly=Microsoft.Samples.Kinect.WpfViewers" Loaded="Window_Loaded" Closing="Window_Closing" WindowState="Maximized">
     <Grid>
         <my:KinectSensorChooser HorizontalAlignment="Left" Margin="216,384,0,0" Name="kinectSensorChooser1" VerticalAlignment="Top" Width="328" />
         <my:KinectColorViewer HorizontalAlignment="Left" Margin="12,12,0,0" Name="kinectColorViewer1" VerticalAlignment="Top" Height="350" Width="350" Kinect="{Binding ElementName=kinectSensorChooser1, Path=Kinect}" />
         <my:KinectSkeletonViewer HorizontalAlignment="Left" Margin="375,12,0,0" Name="kinectSkeletonViewer1" VerticalAlignment="Top" Width="350" Height="350" Kinect="{Binding ElementName=kinectSensorChooser1, Path=Kinect}" />
-        <TextBox Height="47" HorizontalAlignment="Left" Margin="12,534,0,0" Name="UserPresence" VerticalAlignment="Top" Width="275" FontWeight="Bold" FontSize="16" />
-        <TextBox Height="47" HorizontalAlignment="Left" Margin="375,534,0,0" Name="Emotion" VerticalAlignment="Top" Width="275" FontWeight="Bold" FontSize="16" />
+        <TextBox Height="47" HorizontalAlignment="Left" Margin="12,534,0,0" Name="UserPresence" VerticalAlignment="Top" Width="336" FontWeight="Bold" FontSize="16" />
+        <TextBox Height="47" HorizontalAlignment="Left" Margin="375,534,0,0" Name="Emotion" VerticalAlignment="Top" Width="573" FontWeight="Bold" FontSize="16" />
         <Label Content="User Presence" Height="39" HorizontalAlignment="Left" Margin="12,484,0,0" Name="userLabel" VerticalAlignment="Top" Width="186" FontSize="18" />
         <Label Content="Emotion" Height="42" HorizontalAlignment="Left" Margin="375,484,0,0" Name="label2" VerticalAlignment="Top" Width="186" FontSize="18" />
-        <Label Height="62" HorizontalAlignment="Left" Margin="80,404,0,0" VerticalAlignment="Top" Width="591" Name="txtOutput" FontWeight="Bold" FontStretch="UltraExpanded" />
+        <Label Height="62" HorizontalAlignment="Left" Margin="27,404,0,0" VerticalAlignment="Top" Width="921" Name="txtOutput" FontWeight="Bold" FontStretch="UltraExpanded" />
     </Grid>
 </Window>

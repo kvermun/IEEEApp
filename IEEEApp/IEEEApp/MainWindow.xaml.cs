@@ -420,7 +420,7 @@ namespace IEEEApp
                 anxietyCount = 0;
                 boredomCount = 0;
                 Emotion.Text = " Keen learner ";
-                txtOutput.Content =  "Good concentration!! You are a keen learner. Keep it on.";
+                txtOutput.Content =  "Good concentration!! You are a keen learner. Keep it up.";
             }
             else if((fatigueCount) >= thresh4)
             {
